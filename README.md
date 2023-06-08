@@ -2,6 +2,7 @@
 # Проект Mesto фронтенд + бэкенд
 
 ## Ссылка на рипозиторий Github
+https://github.com/DmitrySerzhantov/express-mesto-gha.git
 ## Директории
 
 `/routes` — папка с файлами роутера  
