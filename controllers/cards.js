@@ -75,7 +75,7 @@ const likeCard = (req, res) => {
     { new: true }
   )
     .then((card) => {
-      if (req.params.cardId.length === 24) {
+      if (card) {
         return res.status(200).send(card);
       }
       return res.status(404).send({
