@@ -97,7 +97,7 @@ const updateUserAvatar = (req, res) => {
     { avatar: req.body.avatar },
     { returnDocument: 'after', runValidators: true }
   )
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message.includes('validation failed')) {
         res.status(400).send({

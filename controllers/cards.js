@@ -67,11 +67,11 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true }
+    { new: true, returnDocument: 'after' }
   )
     .then((card) => res.status(200).send(card))
     .catch((err) => {
-      if (err.message.includes('cards is not defined')) {
+      if (err.message.includes('ObjectId failed for value')) {
         res.status(404).send({
           message: 'Карточка не найдены !!!',
           err: err.message,
