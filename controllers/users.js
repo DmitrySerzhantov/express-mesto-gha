@@ -22,11 +22,19 @@ const getUsers = (req, res) => {
 
 const getUserById = (req, res) => {
   User.findById(req.params.id)
-    .then((user) => res.status(200).send(user))
+    .then((user) => {
+      if (user !== null) {
+        res.status(200).send(user);
+        return;
+      }
+      res.status(404).send({
+        message: ' Пользователь не найден !!!',
+      });
+    })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
         res.status(404).send({
-          message: ' Пользователь не найден !!!',
+          message: ' Не еарный формат ID !!!',
           err: err.message,
           stack: err.stack,
         });
