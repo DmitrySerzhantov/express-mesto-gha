@@ -20,7 +20,7 @@ const getUserById = (req, res) => {
           message: 'User not found',
         });
       } else {
-        res.status(500).send({
+        res.status(400).send({
           message: 'Internal server error',
           err: err.message,
           stack: err.stack,
