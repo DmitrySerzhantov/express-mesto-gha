@@ -33,7 +33,7 @@ const getUserById = (req, res) => {
     })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        res.status(404).send({
+        res.status(400).send({
           message: ' Не еарный формат ID !!!',
           err: err.message,
           stack: err.stack,
