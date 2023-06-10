@@ -52,8 +52,8 @@ const deleteCard = (req, res) => {
       return res.status(404).send({ message: 'Карточка не найдена' });
     })
     .catch((err) => {
-      if (err.message.includes('cards is not defined')) {
-        res.status(404).send({
+      if (err.message.includes('Cast to ObjectId failed for value')) {
+        res.status(400).send({
           message: 'Карточка не найдены !!!',
           err: err.message,
           stack: err.stack,
@@ -100,10 +100,18 @@ const dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } }, // убрать _id из массива
     { new: true }
   )
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (card) {
+        res.status(200).send(card);
+      }
+      res.status(404).send({
+        message: 'Карточка не найденa !!!',
+      });
+    })
+
     .catch((err) => {
-      if (err.message.includes('cards is not defined')) {
-        res.status(404).send({
+      if (err.message.includes('ObjectId failed for value')) {
+        res.status(400).send({
           message: 'Карточка не найдены !!!',
           err: err.message,
           stack: err.stack,
