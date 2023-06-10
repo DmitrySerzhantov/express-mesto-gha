@@ -3,7 +3,7 @@ const Card = require('../models/card');
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
-    .catch((err) => res.status(500).send({
+    .catch((err) => res.status(400).send({
       message: 'Internal server error',
       err: err.message,
       stack: err.stack,
@@ -16,7 +16,7 @@ const createCard = (req, res) => {
     owner: req.user._id,
   })
     .then((card) => res.status(201).send(card))
-    .catch((err) => res.status(500).send({
+    .catch((err) => res.status(400).send({
       message: 'Internal server error',
       err: err.message,
       stack: err.stack,
@@ -26,7 +26,7 @@ const deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .deleteOne({})
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(500).send({
+    .catch((err) => res.status(400).send({
       message: 'Internal server error',
       err: err.message,
       stack: err.stack,
@@ -40,7 +40,7 @@ const likeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(500).send({
+    .catch((err) => res.status(400).send({
       message: 'Internal server error',
       err: err.message,
       stack: err.stack,
@@ -54,7 +54,7 @@ const dislikeCard = (req, res) => {
     { new: true },
   )
     .then((card) => res.status(200).send(card))
-    .catch((err) => res.status(500).send({
+    .catch((err) => res.status(400).send({
       message: 'Internal server error',
       err: err.message,
       stack: err.stack,
