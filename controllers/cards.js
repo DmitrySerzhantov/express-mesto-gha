@@ -73,15 +73,11 @@ const likeCard = (req, res) => {
     .then((card) => {
       if (card.likes.map((item) => item === req.user._id)) {
         res.status(200).send(card);
-        return;
       }
-      res.status(404).send({
-        message: ' Пользователь не найден !!!',
-      });
     })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        res.status(404).send({
+        res.status(400).send({
           message: 'Карточка не найдены !!!',
           err: err.message,
           stack: err.stack,
