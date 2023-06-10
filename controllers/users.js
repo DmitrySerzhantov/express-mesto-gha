@@ -67,6 +67,7 @@ const createUser = (req, res) => {
       });
     });
 };
+
 const updateUser = async (req, res) => {
   User.findOneAndUpdate({ _id: req.user._id }, req.body, {
     returnDocument: 'after',
@@ -74,7 +75,7 @@ const updateUser = async (req, res) => {
   })
     .then((user) => res.status(200).send(user))
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.message.includes('Validation failed')) {
         res.status(400).send({
           message: 'Переданы некорректные данные пользователя!!!',
           err: err.message,
