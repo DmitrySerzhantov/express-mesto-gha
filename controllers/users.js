@@ -25,7 +25,7 @@ const getUserById = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        res.status(404).send({
+        res.status(400).send({
           message: ' Пользователь не найден !!!',
           err: err.message,
           stack: err.stack,
@@ -64,7 +64,7 @@ const updateUser = async (req, res) => {
     returnDocument: 'after',
     runValidators: true,
   })
-    .then((user) => res.status(201).send(user))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message.includes('validation failed')) {
         res.status(400).send({
