@@ -1,5 +1,4 @@
 const Card = require('../models/card');
-const { find, findById } = require('../models/user');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -68,26 +67,24 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true, returnDocument: 'after' }
+    { new: true }
   )
     .then((card) => {
-      if (card.likes.map((item) => item === req.user._id)) {
-        res.status(200).send(card);
+      if (req.params.cardId.length === 24) {
+        return res.status(200).send(card);
       }
+      return res.status(404).send({
+        message: 'Карточка не найденa !!!',
+      });
     })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        res.status(400).send({
-          message: 'Карточка не найдены !!!',
-          err: err.message,
-          stack: err.stack,
+        return res.status(400).send({
+          message: 'Карточка не найденa !!!',
         });
-        return;
       }
-      res.status(500).send({
+      return res.status(500).send({
         message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
       });
     });
 };
