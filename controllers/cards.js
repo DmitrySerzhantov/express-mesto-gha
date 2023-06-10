@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const { find, findById } = require('../models/user');
 
 const getCards = (req, res) => {
   Card.find({})
@@ -69,7 +70,15 @@ const likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
     { new: true, returnDocument: 'after' }
   )
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (card.likes.map((item) => item === req.user._id)) {
+        res.status(200).send(card);
+        return;
+      }
+      res.status(404).send({
+        message: ' Пользователь не найден !!!',
+      });
+    })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
         res.status(404).send({
