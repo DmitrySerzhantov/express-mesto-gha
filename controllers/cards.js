@@ -45,7 +45,12 @@ const createCard = (req, res) => {
 const deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .deleteOne({})
-    .then((card) => res.status(200).send(card))
+    .then((card) => {
+      if (card.deletedCount > 0) {
+        res.status(200).send(card);
+      }
+      return res.status(404).send({ message: 'Карточка не найдена' });
+    })
     .catch((err) => {
       if (err.message.includes('cards is not defined')) {
         res.status(404).send({
