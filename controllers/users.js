@@ -25,7 +25,7 @@ const getUserById = (req, res) => {
     .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        res.status(400).send({
+        res.status(404).send({
           message: ' Пользователь не найден !!!',
           err: err.message,
           stack: err.stack,
@@ -86,7 +86,7 @@ const updateUserAvatar = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { avatar: req.body.avatar },
-    { returnDocument: 'after', runValidators: true },
+    { returnDocument: 'after', runValidators: true }
   )
     .then((user) => res.status(201).send(user))
     .catch((err) => {
