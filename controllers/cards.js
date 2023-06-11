@@ -4,14 +4,12 @@ const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(200).send(cards))
     .catch((err) => {
-      if (err.message.includes('cards is not defined')) {
-        res.status(404).send({
-          message: 'Карточки не найдены !!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
-      }
+      res.status(404).send({
+        message: 'Карточки не найдены !!!',
+        err: err.message,
+        stack: err.stack,
+      });
+
       res.status(500).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,

@@ -4,14 +4,12 @@ const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
     .catch((err) => {
-      if (err.message.includes('users is not defined')) {
-        res.status(404).send({
-          message: ' Пользователи не найден !!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
-      }
+      res.status(404).send({
+        message: ' Пользователи не найден !!!',
+        err: err.message,
+        stack: err.stack,
+      });
+
       res.status(500).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,
@@ -34,7 +32,7 @@ const getUserById = (req, res) => {
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
         res.status(400).send({
-          message: ' Не еарный формат ID !!!',
+          message: ' Не веарный формат ID !!!',
           err: err.message,
           stack: err.stack,
         });
