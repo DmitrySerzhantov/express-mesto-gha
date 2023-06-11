@@ -1,16 +1,22 @@
 const Card = require('../models/card');
 
+const ok = 200;
+const created = 201;
+const internalServerError = 500;
+const badRequest = 400;
+const notFound = 404;
+
 const getCards = (req, res) => {
   Card.find({})
-    .then((cards) => res.status(200).send(cards))
+    .then((cards) => res.status(ok).send(cards))
     .catch((err) => {
-      res.status(404).send({
+      res.status(notFound).send({
         message: 'Карточки не найдены !!!',
         err: err.message,
         stack: err.stack,
       });
 
-      res.status(500).send({
+      res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,
         stack: err.stack,
@@ -23,17 +29,17 @@ const createCard = (req, res) => {
     ...req.body,
     owner: req.user._id,
   })
-    .then((card) => res.status(201).send(card))
+    .then((card) => res.status(created).send(card))
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
-        res.status(400).send({
+      if (err.name === 'ValidationError') {
+        res.status(badRequest).send({
           message: 'Переданы некорректные данные поля карточки!!!',
           err: err.message,
           stack: err.stack,
         });
         return;
       }
-      res.status(500).send({
+      res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,
         stack: err.stack,
@@ -41,24 +47,23 @@ const createCard = (req, res) => {
     });
 };
 const deleteCard = (req, res) => {
-  Card.findById(req.params.cardId)
-    .deleteOne({})
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if (card.deletedCount > 0) {
-        res.status(200).send(card);
+      if (card) {
+        return res.status(ok).send(card);
       }
-      return res.status(404).send({ message: 'Карточка не найдена' });
+      return res.status(notFound).send({ message: 'Карточка не найдена' });
     })
     .catch((err) => {
-      if (err.message.includes('Cast to ObjectId failed for value')) {
-        res.status(400).send({
-          message: 'Карточка не найдены !!!',
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({
+          message: 'Передан не верный формат ID !!!',
           err: err.message,
           stack: err.stack,
         });
         return;
       }
-      res.status(500).send({
+      res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,
         stack: err.stack,
@@ -69,24 +74,24 @@ const deleteCard = (req, res) => {
 const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $addToSet: { likes: req.user._id } }, // добавить _id в массив, если его там нет
-    { new: true }
+    { $addToSet: { likes: req.user._id } },
+    { new: true },
   )
     .then((card) => {
       if (card) {
-        return res.status(200).send(card);
+        return res.status(ok).send(card);
       }
-      return res.status(404).send({
+      return res.status(notFound).send({
         message: 'Карточка не найденa !!!',
       });
     })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        return res.status(400).send({
-          message: 'Карточка не найденa !!!',
+        return res.status(badRequest).send({
+          message: 'Передан не верный формат ID !!!',
         });
       }
-      return res.status(500).send({
+      return res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
       });
     });
@@ -95,28 +100,28 @@ const likeCard = (req, res) => {
 const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
-    { $pull: { likes: req.user._id } }, // убрать _id из массива
-    { new: true }
+    { $pull: { likes: req.user._id } },
+    { new: true },
   )
     .then((card) => {
       if (card) {
-        res.status(200).send(card);
+        return res.status(ok).send(card);
       }
-      res.status(404).send({
+      return res.status(notFound).send({
         message: 'Карточка не найденa !!!',
       });
     })
 
     .catch((err) => {
-      if (err.message.includes('ObjectId failed for value')) {
-        res.status(400).send({
-          message: 'Карточка не найдены !!!',
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({
+          message: 'Передан не верный формат ID !!!',
           err: err.message,
           stack: err.stack,
         });
         return;
       }
-      res.status(500).send({
+      res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,
         stack: err.stack,
