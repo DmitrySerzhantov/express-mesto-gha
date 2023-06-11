@@ -73,10 +73,14 @@ const createUser = (req, res) => {
 };
 
 const updateUser = async (req, res) => {
-  User.findOneAndUpdate({ _id: req.user._id }, req.body, {
-    returnDocument: 'after',
-    runValidators: true,
-  })
+  User.findOneAndUpdate(
+    { _id: req.user._id },
+    { name: req.body.name, about: req.body.about },
+    {
+      returnDocument: 'after',
+      runValidators: true,
+    },
+  )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
       if (err.message.includes('Validation failed')) {
@@ -99,7 +103,7 @@ const updateUserAvatar = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { avatar: req.body.avatar },
-    { returnDocument: 'after', runValidators: true }
+    { returnDocument: 'after', runValidators: true },
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
