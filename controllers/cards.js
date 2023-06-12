@@ -1,21 +1,17 @@
 const Card = require('../models/card');
 
-const ok = 200;
-const created = 201;
-const internalServerError = 500;
-const badRequest = 400;
-const notFound = 404;
+const {
+  ok,
+  created,
+  internalServerError,
+  badRequest,
+  notFound,
+} = require('../utils/constants');
 
 const getCards = (req, res) => {
   Card.find({})
     .then((cards) => res.status(ok).send(cards))
     .catch((err) => {
-      res.status(notFound).send({
-        message: 'Карточки не найдены !!!',
-        err: err.message,
-        stack: err.stack,
-      });
-
       res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,

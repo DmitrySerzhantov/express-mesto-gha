@@ -1,21 +1,16 @@
 const User = require('../models/user');
-
-const ok = 200;
-const created = 201;
-const internalServerError = 500;
-const badRequest = 400;
-const notFound = 404;
+const {
+  ok,
+  created,
+  internalServerError,
+  badRequest,
+  notFound,
+} = require('../utils/constants');
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(ok).send(users))
     .catch((err) => {
-      res.status(notFound).send({
-        message: 'Пользователи не найден !!!',
-        err: err.message,
-        stack: err.stack,
-      });
-
       res.status(internalServerError).send({
         message: 'Внутренняя ошибка сервера!!!',
         err: err.message,
