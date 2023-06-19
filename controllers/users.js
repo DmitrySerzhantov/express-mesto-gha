@@ -1,3 +1,5 @@
+const bcrypt = require('bcryptjs');
+const jsonWebToken = require('jsonwebtoken');
 const User = require('../models/user');
 const {
   ok,
@@ -47,13 +49,65 @@ const getUserById = (req, res) => {
     });
 };
 
-const createUser = (req, res) => {
-  User.create(req.body)
-    .then((user) => res.status(created).send(user))
+const createUser = (req, res, next) => {
+  bcrypt
+    .hash(String(req.body.password), 10)
+    .then((hashedPassword) => {
+      User.create({
+        ...req.body,
+        password: hashedPassword,
+      })
+        .then((user) => {
+          res.status(created).send({ data: user });
+        })
+        .catch(next);
+    })
+    .catch(next);
+};
+
+const login = (req, res, next) => {
+  const { email, password } = req.body;
+  User.findOne({ email })
+    .select('+password')
+    .orFail(() => new Error('Введены не верные данные'))
+    .then((user) => {
+      bcrypt.compare(String(password), user.password).then((isValidUser) => {
+        if (isValidUser) {
+          const jwt = jsonWebToken.sign(
+            {
+              _id: user.id,
+            },
+            'SECRET'
+          );
+          res.cookie('jwt', jwt, {
+            maxAge: 360000,
+            httpOnly: true,
+            sameSite: true,
+          });
+          res.send({ data: user.toJSON() });
+        } else {
+          res.status(401).send({ message: 'Введены не верные данные' });
+        }
+      });
+    })
+    .catch(next);
+};
+
+const userProfile = (req, res, next) => {
+  User.findById(req.user._id)
+    .then((user) => {
+      if (user !== null) {
+        res.status(ok).send(user);
+        return;
+      }
+      res.status(notFound).send({
+        message: ' Пользователь не найден !!!',
+      });
+    })
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
+      if (err.message.includes('ObjectId failed for value')) {
         res.status(badRequest).send({
-          message: 'Переданы некорректные данные пользователя!!!',
+          message: ' Не веарный формат ID !!!',
           err: err.message,
           stack: err.stack,
         });
@@ -74,7 +128,7 @@ const updateUser = async (req, res) => {
     {
       returnDocument: 'after',
       runValidators: true,
-    },
+    }
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
@@ -98,7 +152,7 @@ const updateUserAvatar = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { avatar: req.body.avatar },
-    { returnDocument: 'after', runValidators: true },
+    { returnDocument: 'after', runValidators: true }
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
@@ -124,4 +178,6 @@ module.exports = {
   createUser,
   updateUser,
   updateUserAvatar,
+  login,
+  userProfile,
 };

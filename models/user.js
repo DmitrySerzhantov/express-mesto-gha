@@ -1,3 +1,4 @@
+const validator = require('validator');
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
@@ -5,18 +6,40 @@ const userSchema = new mongoose.Schema({
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    default: 'Жак-Ив Кусто',
   },
   about: {
     type: String,
     minlength: 2,
     maxlength: 30,
-    required: true,
+    default: 'Исследователь',
   },
   avatar: {
     type: String,
-    required: true,
+    default:
+      'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: [true, 'Поле email должно быть заполнено'],
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error('введены не верные данные');
+      }
+    },
+  },
+  password: {
+    type: String,
+    required: [true, 'Поле password должно быть заполнено'],
+    select: false,
   },
 });
+
+userSchema.methods.toJSON = function () {
+  const user = this.toObject();
+  delete user.password;
+  return user;
+};
 
 module.exports = mongoose.model('user', userSchema);
