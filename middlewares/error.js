@@ -16,6 +16,7 @@ class AbstractError extends Error {
 }
 
 const errorHandler = (err, req, res, next) => {
+  console.log(err);
   const { statusCode = 500, message } = err;
   if (err.code === 11000) {
     res
