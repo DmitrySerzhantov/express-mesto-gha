@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const NotFoundError = require('../errors/NotFoundError');
 
 const {
   ok,
@@ -42,8 +43,11 @@ const createCard = (req, res) => {
       });
     });
 };
-const deleteCard = (req, res) => {
+const deleteCard = (req, res, next) => {
   Card.findById(req.params.cardId)
+    .orFail(() => {
+      throw new NotFoundError('Карточка с таким ID не существует');
+    })
     .then((card) => {
       if (String(card.owner) === req.user._id) {
         Card.findByIdAndRemove(req.params.cardId).then((cardDeleted) => {
@@ -61,13 +65,10 @@ const deleteCard = (req, res) => {
           message: 'Передан не верный формат ID !!!',
           err: err.message,
         });
-        return;
       }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-      });
-    });
+      next(err);
+    })
+    .catch(next);
 };
 
 const likeCard = (req, res) => {
