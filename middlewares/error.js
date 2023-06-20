@@ -1,5 +1,4 @@
 const errorHandler = (err, req, res, next) => {
-  console.log(err);
   if (String(err.message) === 'error') {
     res.status(401).send({ message: 'Не верные данные пользователя!!!' });
     return;

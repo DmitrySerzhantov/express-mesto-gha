@@ -54,7 +54,7 @@ const deleteCard = (req, res, next) => {
           res.status(ok).send(cardDeleted);
         });
       } else {
-        res.status(internalServerError).send({
+        res.status(403).send({
           message: 'Карточка принадлежит другому пользователю',
         });
       }
@@ -75,7 +75,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (card) {
@@ -101,7 +101,7 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (card) {
