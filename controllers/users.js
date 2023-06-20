@@ -21,18 +21,19 @@ const getUsers = (req, res, next) => {
 
 const getUserById = (req, res, next) => {
   User.findById(req.params.id)
+    .orFail(() => {
+      throw new NotFoundError('пользователь с таким ID не найден');
+    })
     .then((user) => {
-      if (user !== null) {
+      if (user) {
         res.status(ok).send(user);
-        return;
       }
-      throw new NotFoundError('Нет пользователя с таким id');
     })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
         throw new BadRequest(' Не веарный формат ID !!!');
       }
-      next();
+      next(err);
     })
     .catch(next);
 };
