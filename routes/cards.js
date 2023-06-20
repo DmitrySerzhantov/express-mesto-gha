@@ -62,5 +62,4 @@ router.delete(
   }),
   dislikeCard,
 );
-
 module.exports = router;
