@@ -15,22 +15,18 @@ class AbstractError extends Error {
   }
 }
 
-class NotFoundError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 404;
-  }
-}
-
 const errorHandler = (err, req, res, next) => {
   const { statusCode = 500, message } = err;
-  res
-    .status(err.statusCode)
-    .send({
-      message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-    });
+  if (err.code === 11000) {
+    res
+      .status(409)
+      .send({ message: 'Пользователь с таким email уже существует' });
+    return;
+  }
+  res.status(err.statusCode).send({
+    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
+  });
   next();
 };
 
-module.exports = NotFoundError;
 module.exports = errorHandler;

@@ -47,6 +47,7 @@ const createUser = (req, res, next) => {
         .then((user) => {
           res.status(created).send({ data: user });
         })
+
         .catch(next);
     })
     .catch(next);
