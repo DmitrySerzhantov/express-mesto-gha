@@ -8,45 +8,32 @@ const {
   badRequest,
   notFound,
 } = require('../utils/constants');
+const NotFoundError = require('../errors/NotFoundError');
+const BadRequest = require('../errors/BadRequest');
 
-const getUsers = (req, res) => {
+const getUsers = (req, res, next) => {
   User.find({})
-    .then((users) => res.status(ok).send(users))
-    .catch((err) => {
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
+    .then((users) => {
+      res.status(ok).send(users);
+    })
+    .catch(next);
 };
 
-const getUserById = (req, res) => {
+const getUserById = (req, res, next) => {
   User.findById(req.params.id)
     .then((user) => {
       if (user !== null) {
         res.status(ok).send(user);
         return;
       }
-      res.status(notFound).send({
-        message: ' Пользователь не найден !!!',
-      });
+      throw new NotFoundError('Нет пользователя с таким id');
     })
     .catch((err) => {
       if (err.message.includes('ObjectId failed for value')) {
-        res.status(badRequest).send({
-          message: ' Не веарный формат ID !!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
+        throw new BadRequest(' Не веарный формат ID !!!');
       }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
+    })
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
