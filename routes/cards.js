@@ -34,7 +34,7 @@ router.put(
   celebrate({
     params: Joi.object()
       .keys({
-        id: Joi.string().alphanum().length(24),
+        cardId: Joi.string().alphanum().length(24),
       })
       .unknown(true),
   }),
