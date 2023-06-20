@@ -7,7 +7,7 @@ const auth = (req, res, next) => {
   try {
     payload = jwt.verify(token, 'SECRET');
   } catch (err) {
-    next((err, { statusCode: 500 }));
+    next((err, { statusCode: 401 }));
   }
   req.user = payload;
 
