@@ -56,7 +56,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
     .select('+password')
-    .orFail(() => new Error('Введены не верные данные'))
+    .orFail(() => new Error('error'))
     .then((user) => {
       bcrypt.compare(String(password), user.password).then((isValidUser) => {
         if (isValidUser) {
@@ -72,8 +72,6 @@ const login = (req, res, next) => {
             sameSite: true,
           });
           res.send({ data: user.toJSON() });
-        } else {
-          res.status(401).send({ message: 'Введены не верные данные' });
         }
       });
     })
