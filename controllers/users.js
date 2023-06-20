@@ -47,7 +47,11 @@ const createUser = (req, res, next) => {
         .then((user) => {
           res.status(created).send({ data: user });
         })
-
+        .catch((err) => {
+          if (err._message.includes('user validation failed')) {
+            throw new BadRequest('ошибка проверки пользователя');
+          }
+        })
         .catch(next);
     })
     .catch(next);
