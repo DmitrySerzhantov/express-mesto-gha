@@ -2,8 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
-const { celebrate, Joi } = require('celebrate');
-const { errors } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const router = require('./routes');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -39,7 +38,7 @@ app.post(
       })
       .unknown(true),
   }),
-  createUser
+  createUser,
 );
 app.post(
   '/signin',
@@ -51,7 +50,7 @@ app.post(
       })
       .unknown(true),
   }),
-  login,
+  login
 );
 app.use(auth);
 app.use(router);

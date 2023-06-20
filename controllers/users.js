@@ -32,6 +32,7 @@ const getUserById = (req, res, next) => {
       if (err.message.includes('ObjectId failed for value')) {
         throw new BadRequest(' Не веарный формат ID !!!');
       }
+      next();
     })
     .catch(next);
 };
