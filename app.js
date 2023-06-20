@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 const router = require('./routes');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
@@ -26,6 +27,7 @@ app.post('/signup', createUser);
 app.post('/signin', login);
 app.use(auth);
 app.use(router);
+app.use(errors);
 app.use(errorHandler);
 
 app.listen(PORT, () => {});
