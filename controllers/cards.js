@@ -71,7 +71,7 @@ const likeCard = (req, res, next) => {
     });
 };
 
-const dislikeCard = (req, res) => {
+const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
@@ -81,25 +81,13 @@ const dislikeCard = (req, res) => {
       if (card) {
         return res.status(ok).send(card);
       }
-      return res.status(notFound).send({
-        message: 'Карточка не найденa !!!',
-      });
+      throw new NotFoundError('Карточка не найденa !!!');
     })
-
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(badRequest).send({
-          message: 'Передан не верный формат ID !!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
+        BadRequest('Передан не верный формат ID !!!');
       }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
+      next(err);
     });
 };
 
