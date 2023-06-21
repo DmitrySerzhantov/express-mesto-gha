@@ -50,7 +50,7 @@ const deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (String(card.owner) === req.user._id) {
-        Card.deleteOne(req.params.cardId).then((cardDeleted) => res.status(ok).send(cardDeleted));
+        card.deleteOne(req.params.cardId).then((cardDeleted) => res.status(ok).send(cardDeleted));
       } else {
         res.status(403).send({
           message: 'Карточка принадлежит другому пользователю',
