@@ -1,5 +1,6 @@
 const Card = require('../models/card');
 const NotFoundError = require('../errors/NotFoundError');
+const Forbidden = require('../errors/Forbidden');
 
 const {
   ok,
@@ -53,9 +54,17 @@ const deleteCard = (req, res, next) => {
         card.deleteOne();
         res.status(ok).send(card);
       }
-      next();
+      throw new Forbidden('Карточка принадлежит другому пользователю');
     })
-
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(badRequest).send({
+          message: 'Передан не верный формат ID !!!',
+          err: err.message,
+        });
+      }
+      next(err);
+    })
     .catch(next);
 };
 
