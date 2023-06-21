@@ -29,12 +29,6 @@ const getUserById = (req, res, next) => {
         res.status(ok).send(user);
       }
     })
-    .catch((err) => {
-      if (err.message.includes('ObjectId failed for value')) {
-        throw new BadRequest(' Не веарный формат ID !!!');
-      }
-      next(err);
-    })
     .catch(next);
 };
 
@@ -66,7 +60,7 @@ const login = (req, res, next) => {
             {
               _id: user.id,
             },
-            'SECRET',
+            'SECRET'
           );
           res.cookie('jwt', jwt, {
             maxAge: 360000,
@@ -115,7 +109,7 @@ const updateUser = async (req, res) => {
     {
       returnDocument: 'after',
       runValidators: true,
-    },
+    }
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
@@ -139,7 +133,7 @@ const updateUserAvatar = (req, res) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { avatar: req.body.avatar },
-    { returnDocument: 'after', runValidators: true },
+    { returnDocument: 'after', runValidators: true }
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
