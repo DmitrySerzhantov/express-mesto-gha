@@ -1,15 +1,10 @@
 const bcrypt = require('bcryptjs');
 const jsonWebToken = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  ok,
-  created,
-  internalServerError,
-  badRequest,
-  notFound,
-} = require('../utils/constants');
+const { ok, created } = require('../utils/constants');
 const NotFoundError = require('../errors/NotFoundError');
 const Unauthorized = require('../errors/Unauthorized');
+const BadRequest = require('../errors/BadRequest');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -90,34 +85,25 @@ const userProfile = (req, res, next) => {
     .catch(next);
 };
 
-const updateUser = async (req, res) => {
+const updateUser = async (req, res, next) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { name: req.body.name, about: req.body.about },
     {
       returnDocument: 'after',
       runValidators: true,
-    },
+    }
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
-      if (err.message.includes('Validation failed')) {
-        res.status(badRequest).send({
-          message: 'Переданы некорректные данные пользователя!!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
+      if (err.name === 'CastError') {
+        throw new BadRequest('Переданы некорректные данные пользователя!!!');
       }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
+    })
+    .catch(next);
 };
 
-const updateUserAvatar = (req, res) => {
+const updateUserAvatar = (req, res, next) => {
   User.findOneAndUpdate(
     { _id: req.user._id },
     { avatar: req.body.avatar },
@@ -125,20 +111,11 @@ const updateUserAvatar = (req, res) => {
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
-      if (err.message.includes('validation failed')) {
-        res.status(badRequest).send({
-          message: 'Переданы некорректные данные пользователя!!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
+      if (err.name === 'CastError') {
+        throw new BadRequest('Переданы некорректные данные пользователя!!!');
       }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
+    })
+    .catch(next);
 };
 
 module.exports = {
