@@ -3,13 +3,7 @@ const NotFoundError = require('../errors/NotFoundError');
 const Forbidden = require('../errors/Forbidden');
 const BadRequest = require('../errors/BadRequest');
 
-const {
-  ok,
-  created,
-  internalServerError,
-  badRequest,
-  notFound,
-} = require('../utils/constants');
+const { ok, created } = require('../utils/constants');
 
 const getCards = (req, res, next) => {
   Card.find({})
@@ -55,7 +49,7 @@ const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (card) {
@@ -75,7 +69,7 @@ const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true }
+    { new: true },
   )
     .then((card) => {
       if (card) {
