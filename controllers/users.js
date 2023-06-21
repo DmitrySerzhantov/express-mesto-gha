@@ -9,6 +9,7 @@ const {
   notFound,
 } = require('../utils/constants');
 const NotFoundError = require('../errors/NotFoundError');
+const Unauthorized = require('../errors/Unauthorized');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -51,7 +52,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
     .select('+password')
-    .orFail(() => new NotFoundError('Неверные данные пользователя'))
+    .orFail(() => new Unauthorized('Неверные данные пользователя'))
     .then((user) => {
       bcrypt
         .compare(String(password), user.password)
@@ -70,7 +71,7 @@ const login = (req, res, next) => {
             });
             return res.send({ data: user.toJSON() });
           }
-          throw new NotFoundError('Неверные данные пользователя');
+          throw new Unauthorized('Неверные данные пользователя');
         })
         .catch(next);
     })
