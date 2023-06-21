@@ -11,19 +11,13 @@ const {
   notFound,
 } = require('../utils/constants');
 
-const getCards = (req, res) => {
+const getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.status(ok).send(cards))
-    .catch((err) => {
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
+    .catch(next);
 };
 
-const createCard = (req, res) => {
+const createCard = (req, res, next) => {
   Card.create({
     ...req.body,
     owner: req.user._id,
@@ -31,18 +25,9 @@ const createCard = (req, res) => {
     .then((card) => res.status(created).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(badRequest).send({
-          message: 'Переданы некорректные данные поля карточки!!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
+        BadRequest('Переданы некорректные данные поля карточки!!!');
+        next();
       }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
     });
 };
 
@@ -71,7 +56,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (card) {
@@ -97,7 +82,7 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (card) {
