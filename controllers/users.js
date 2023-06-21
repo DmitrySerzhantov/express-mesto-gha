@@ -78,32 +78,16 @@ const login = (req, res, next) => {
     .catch(next);
 };
 
-const userProfile = (req, res) => {
+const userProfile = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (user !== null) {
         res.status(ok).send(user);
         return;
       }
-      res.status(notFound).send({
-        message: ' Пользователь не найден !!!',
-      });
+      throw new NotFoundError('пользователь с таким ID не найден');
     })
-    .catch((err) => {
-      if (err.message.includes('ObjectId failed for value')) {
-        res.status(badRequest).send({
-          message: ' Не веарный формат ID !!!',
-          err: err.message,
-          stack: err.stack,
-        });
-        return;
-      }
-      res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-        err: err.message,
-        stack: err.stack,
-      });
-    });
+    .catch(next);
 };
 
 const updateUser = async (req, res) => {
