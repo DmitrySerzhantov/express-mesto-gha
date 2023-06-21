@@ -27,7 +27,7 @@ const createCard = (req, res, next) => {
       if (err.name === 'ValidationError') {
         BadRequest('Переданы некорректные данные поля карточки!!!');
       }
-      next();
+      next(err);
     });
 };
 
@@ -45,14 +45,13 @@ const deleteCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequest('Передан не верный формат ID !!!');
+        BadRequest('Передан не верный формат ID !!!');
       }
       next(err);
-    })
-    .catch(next);
+    });
 };
 
-const likeCard = (req, res) => {
+const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
@@ -62,19 +61,13 @@ const likeCard = (req, res) => {
       if (card) {
         return res.status(ok).send(card);
       }
-      return res.status(notFound).send({
-        message: 'Карточка не найденa !!!',
-      });
+      throw new NotFoundError('Карточка не найденa !!!');
     })
     .catch((err) => {
-      if (err.message.includes('ObjectId failed for value')) {
-        return res.status(badRequest).send({
-          message: 'Передан не верный формат ID !!!',
-        });
+      if (err.name === 'CastError') {
+        BadRequest('Передан не верный формат ID !!!');
       }
-      return res.status(internalServerError).send({
-        message: 'Внутренняя ошибка сервера!!!',
-      });
+      next(err);
     });
 };
 
