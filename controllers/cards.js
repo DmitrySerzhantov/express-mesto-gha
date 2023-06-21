@@ -50,24 +50,12 @@ const deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (String(card.owner) === req.user._id) {
-        Card.deleteOne(req.params.cardId).then((cardDeleted) => {
-          res.status(ok).send(cardDeleted);
-        });
-      } else {
-        res.status(403).send({
-          message: 'Карточка принадлежит другому пользователю',
-        });
+        card.deleteOne();
+        res.status(ok).send(card);
       }
+      next();
     })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(badRequest).send({
-          message: 'Передан не верный формат ID !!!',
-          err: err.message,
-        });
-      }
-      next(err);
-    })
+
     .catch(next);
 };
 
@@ -75,7 +63,7 @@ const likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (card) {
@@ -101,7 +89,7 @@ const dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    { new: true }
   )
     .then((card) => {
       if (card) {
