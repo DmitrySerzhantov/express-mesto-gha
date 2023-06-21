@@ -22,7 +22,6 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
-    minlength: 2,
     required: [true, 'Поле email должно быть заполнено'],
     validate(value) {
       if (!validator.isEmail(value)) {
@@ -32,7 +31,6 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minlength: 2,
     required: [true, 'Поле password должно быть заполнено'],
     select: false,
   },
