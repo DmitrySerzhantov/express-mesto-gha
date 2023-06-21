@@ -7,7 +7,7 @@ const router = require('./routes');
 const { createUser, login } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/error');
-const regularValidetUrl = require('./utils/constants');
+const { regularValidetUrl } = require('./utils/constants');
 
 // Слушаем 3000 порт
 const { PORT = 3000 } = process.env;
