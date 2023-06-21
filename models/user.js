@@ -15,14 +15,13 @@ const userSchema = new mongoose.Schema({
     default: 'Исследователь',
   },
   avatar: {
-    type: String,
+    type: URL,
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
   },
   email: {
     type: String,
     unique: true,
-    minlength: 2,
     required: [true, 'Поле email должно быть заполнено'],
     validate(value) {
       if (!validator.isEmail(value)) {
@@ -32,16 +31,9 @@ const userSchema = new mongoose.Schema({
   },
   password: {
     type: String,
-    minlength: 2,
     required: [true, 'Поле password должно быть заполнено'],
     select: false,
   },
 });
-
-userSchema.methods.toJSON = function deletePassword() {
-  const user = this.toObject();
-  delete user.password;
-  return user;
-};
 
 module.exports = mongoose.model('user', userSchema);
