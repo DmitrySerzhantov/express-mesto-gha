@@ -97,7 +97,7 @@ const updateUser = async (req, res) => {
     {
       returnDocument: 'after',
       runValidators: true,
-    }
+    },
   )
     .then((user) => res.status(ok).send(user))
     .catch((err) => {
