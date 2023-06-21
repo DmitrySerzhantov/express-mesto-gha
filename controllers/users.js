@@ -9,7 +9,6 @@ const {
   notFound,
 } = require('../utils/constants');
 const NotFoundError = require('../errors/NotFoundError');
-const BadRequest = require('../errors/BadRequest');
 
 const getUsers = (req, res, next) => {
   User.find({})
@@ -52,24 +51,28 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
   User.findOne({ email })
     .select('+password')
-    .orFail(() => new Error('error'))
+    .orFail(() => new NotFoundError('Неверные данные пользователя'))
     .then((user) => {
-      bcrypt.compare(String(password), user.password).then((isValidUser) => {
-        if (isValidUser) {
-          const jwt = jsonWebToken.sign(
-            {
-              _id: user.id,
-            },
-            'SECRET'
-          );
-          res.cookie('jwt', jwt, {
-            maxAge: 360000,
-            httpOnly: true,
-            sameSite: true,
-          });
-          res.send({ data: user.toJSON() });
-        }
-      });
+      bcrypt
+        .compare(String(password), user.password)
+        .then((isValidUser) => {
+          if (isValidUser) {
+            const jwt = jsonWebToken.sign(
+              {
+                _id: user.id,
+              },
+              'SECRET'
+            );
+            res.cookie('jwt', jwt, {
+              maxAge: 360000,
+              httpOnly: true,
+              sameSite: true,
+            });
+            return res.send({ data: user.toJSON() });
+          }
+          throw new NotFoundError('Неверные данные пользователя');
+        })
+        .catch(next);
     })
     .catch(next);
 };
