@@ -17,12 +17,7 @@ const createCard = (req, res, next) => {
     owner: req.user._id,
   })
     .then((card) => res.status(created).send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        BadRequest('Переданы некорректные данные поля карточки!!!');
-      }
-      next(err);
-    });
+    .catch(next);
 };
 
 const deleteCard = (req, res, next) => {
