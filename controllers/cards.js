@@ -17,7 +17,13 @@ const createCard = (req, res, next) => {
     owner: req.user._id,
   })
     .then((card) => res.status(created).send(card))
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequest('Переданы некорректные данные поля карточки!!!'));
+      } else {
+        next(err);
+      }
+    });
 };
 
 const deleteCard = (req, res, next) => {
@@ -27,16 +33,20 @@ const deleteCard = (req, res, next) => {
     })
     .then((card) => {
       if (String(card.owner) === req.user._id) {
-        card.deleteOne();
-        res.status(ok).send(card);
+        card
+          .deleteOne()
+          .then(() => res.status(ok).send(card))
+          .catch(next);
+      } else {
+        throw new Forbidden('Карточка принадлежит другому пользователю');
       }
-      throw new Forbidden('Карточка принадлежит другому пользователю');
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        BadRequest('Передан не верный формат ID !!!');
+        next(new BadRequest('Передан не верный формат ID !!!'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -54,7 +64,7 @@ const likeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        BadRequest('Передан не верный формат ID !!!');
+        next(new BadRequest('Передан не верный формат ID !!!'));
       }
       next(err);
     });
@@ -74,7 +84,7 @@ const dislikeCard = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        BadRequest('Передан не верный формат ID !!!');
+        next(new BadRequest('Передан не верный формат ID !!!'));
       }
       next(err);
     });

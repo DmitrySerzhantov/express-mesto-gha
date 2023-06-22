@@ -6,7 +6,7 @@ const errorHandler = (err, req, res, next) => {
       .send({ message: 'Пользователь с таким email уже существует' });
     return;
   }
-  res.status(err.statusCode).send({
+  res.status(err.statusCode || statusCode).send({
     message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
   });
   next();
