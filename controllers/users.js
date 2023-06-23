@@ -110,10 +110,12 @@ const updateUserAvatar = (req, res, next) => {
     { avatar: req.body.avatar },
     { returnDocument: 'after', runValidators: true },
   )
+
     .then((user) => res.status(ok).send(user))
+
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные пользователя!!!'));
+        next(new BadRequest(err.message));
       } else {
         next(err);
       }

@@ -1,5 +1,6 @@
-const validator = require('validator');
 const mongoose = require('mongoose');
+
+const { validatorURL } = require('../validators/validatorURL');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -18,16 +19,14 @@ const userSchema = new mongoose.Schema({
     type: String,
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
+    validate: [validatorURL, '{PATH} введены не верные данные!!!'],
   },
+
   email: {
     type: String,
     unique: true,
     required: [true, 'Поле email должно быть заполнено'],
-    validate(value) {
-      if (!validator.isEmail(value)) {
-        throw new Error('введены не верные данные');
-      }
-    },
+    validate: [validatorURL, 'Переданы некорректные данные пользователя!!!'],
   },
   password: {
     type: String,
